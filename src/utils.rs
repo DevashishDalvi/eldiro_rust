@@ -1,12 +1,5 @@
 pub(crate) fn extract_digits(s: &str) -> (&str, &str){
-    let digit_end = s
-        .char_indices()
-        .find_map(|(idx, c)| if c.is_ascii_digit() { None } else { Some(idx) })
-        .unwrap_or(s.len());
-
-    let digits = &s[..digit_end];
-    let remainder = &s[digit_end..];
-    (remainder, digits)
+    take_while(|c: char| c.is_ascii_digit(), s)
 }
 
 pub(crate) fn extract_op(s: &str) -> (&str, &str) {
@@ -18,9 +11,29 @@ pub(crate) fn extract_op(s: &str) -> (&str, &str) {
     (&s[1..], &s[0..1])
 }
 
+pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
+    take_while(|c: char| c.is_whitespace(), s)
+}
+
+pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str){
+    let extract_end = s
+        .char_indices()
+        .find_map(|(idx, c)| if accept(c) { None } else { Some(idx) })
+        .unwrap_or(s.len());
+
+    let extracted = &s[..extract_end];
+    let remainder = &s[extract_end..];
+    (remainder, extracted)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    #[test]
+    fn extract_space(){
+        assert_eq!(extract_whitespace("  1"), ("1", "  "));
+    }
     
     #[test]
     fn extract_one_digits_test() {
