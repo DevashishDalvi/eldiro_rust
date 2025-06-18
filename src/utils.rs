@@ -18,9 +18,25 @@ pub(crate) fn extract_op(s: &str) -> (&str, &str) {
     (&s[1..], &s[0..1])
 }
 
+pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
+    let white_space_end = s
+        .char_indices()
+        .find_map(|(idx, c)| if c == ' ' { None } else { Some(idx) })
+        .unwrap_or(s.len());
+    
+    let white_space = &s[..white_space_end];
+    let remainder= &s[white_space_end..];
+    (remainder, white_space)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    #[test]
+    fn extract_space(){
+        assert_eq!(extract_whitespace("  1"), ("1", "  "));
+    }
     
     #[test]
     fn extract_one_digits_test() {
