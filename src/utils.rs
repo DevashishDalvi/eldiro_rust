@@ -1,12 +1,5 @@
 pub(crate) fn extract_digits(s: &str) -> (&str, &str){
-    let digit_end = s
-        .char_indices()
-        .find_map(|(idx, c)| if c.is_ascii_digit() { None } else { Some(idx) })
-        .unwrap_or(s.len());
-
-    let digits = &s[..digit_end];
-    let remainder = &s[digit_end..];
-    (remainder, digits)
+    take_while(|c: char| c.is_ascii_digit(), s)
 }
 
 pub(crate) fn extract_op(s: &str) -> (&str, &str) {
@@ -19,14 +12,18 @@ pub(crate) fn extract_op(s: &str) -> (&str, &str) {
 }
 
 pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
-    let white_space_end = s
+    take_while(|c: char| c.is_whitespace(), s)
+}
+
+pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str){
+    let extract_end = s
         .char_indices()
-        .find_map(|(idx, c)| if c == ' ' { None } else { Some(idx) })
+        .find_map(|(idx, c)| if accept(c) { None } else { Some(idx) })
         .unwrap_or(s.len());
-    
-    let white_space = &s[..white_space_end];
-    let remainder= &s[white_space_end..];
-    (remainder, white_space)
+
+    let extracted = &s[..extract_end];
+    let remainder = &s[extract_end..];
+    (remainder, extracted)
 }
 
 #[cfg(test)]
