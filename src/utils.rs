@@ -27,24 +27,40 @@ pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str)
 }
 
 pub(crate) fn extract_ident(s: &str) -> (&str, &str){
-    take_while(|c: char| c.is_ascii_alphanumeric(), s)
+    // take_while(|c: char| c.is_ascii_alphanumeric(), s)
+    let input_starts_with_alphabetic = s
+        .chars()
+        .next()
+        .map(|c| c.is_ascii_alphabetic())
+        .unwrap_or(false);
+    
+    if input_starts_with_alphabetic {
+        take_while(|c: char| c.is_ascii_alphanumeric(), s)
+    } else { 
+        (s, "")
+    }
 }
 
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn extract_ident_starts_with_num_error(){
+        assert_eq!(extract_ident("123"), ("123", ""));
+    }
     
     #[test]
     fn extract_alphabetic_ident(){
         assert_eq!(extract_ident("abcd stop"), (" stop", "abcd"));
     }
-    
+
     #[test]
     fn extract_alphabetic_func(){
         assert_eq!(extract_ident("function01()"), ("()", "function01"));
     }
-    
+
     #[test]
     fn extract_space(){
         assert_eq!(extract_whitespace("  1"), ("1", "  "));
