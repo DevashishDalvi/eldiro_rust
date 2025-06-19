@@ -26,9 +26,24 @@ pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str)
     (remainder, extracted)
 }
 
+pub(crate) fn extract_ident(s: &str) -> (&str, &str){
+    take_while(|c: char| c.is_ascii_alphanumeric(), s)
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    #[test]
+    fn extract_alphabetic_ident(){
+        assert_eq!(extract_ident("abcd stop"), (" stop", "abcd"));
+    }
+    
+    #[test]
+    fn extract_alphabetic_func(){
+        assert_eq!(extract_ident("function01()"), ("()", "function01"));
+    }
     
     #[test]
     fn extract_space(){
