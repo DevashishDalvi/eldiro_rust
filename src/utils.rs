@@ -33,11 +33,19 @@ pub(crate) fn extract_ident(s: &str) -> (&str, &str){
         .next()
         .map(|c| c.is_ascii_alphabetic())
         .unwrap_or(false);
-    
+
     if input_starts_with_alphabetic {
         take_while(|c: char| c.is_ascii_alphanumeric(), s)
-    } else { 
+    } else {
         (s, "")
+    }
+}
+
+pub(crate) fn tag<'a, 'b>(starting_text: &'a str, s: &'b str) -> &'b str {
+    if s.starts_with(starting_text) {
+        &s[starting_text.len()..]
+    } else { 
+        panic!("expected {}, got {}", starting_text, s);
     }
 }
 
@@ -47,10 +55,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn tag_word(){
+        assert_eq!(tag("foo", "foo a"), " a");
+        assert_eq!(tag("let", "let a"), " a");
+    }
+    
+    #[test]
     fn extract_ident_starts_with_num_error(){
         assert_eq!(extract_ident("123"), ("123", ""));
     }
-    
+
     #[test]
     fn extract_alphabetic_ident(){
         assert_eq!(extract_ident("abcd stop"), (" stop", "abcd"));
