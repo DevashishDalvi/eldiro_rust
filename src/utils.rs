@@ -1,4 +1,4 @@
-pub(crate) fn extract_digits(s: &str) -> (&str, &str){
+pub(crate) fn extract_digits(s: &str) -> (&str, &str) {
     take_while(|c: char| c.is_ascii_digit(), s)
 }
 
@@ -15,7 +15,7 @@ pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
     take_while(|c: char| c.is_whitespace(), s)
 }
 
-pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str){
+pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
     let extract_end = s
         .char_indices()
         .find_map(|(idx, c)| if accept(c) { None } else { Some(idx) })
@@ -26,7 +26,7 @@ pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str)
     (remainder, extracted)
 }
 
-pub(crate) fn extract_ident(s: &str) -> (&str, &str){
+pub(crate) fn extract_ident(s: &str) -> (&str, &str) {
     // take_while(|c: char| c.is_ascii_alphanumeric(), s)
     let input_starts_with_alphabetic = s
         .chars()
@@ -44,47 +44,46 @@ pub(crate) fn extract_ident(s: &str) -> (&str, &str){
 pub(crate) fn tag<'a, 'b>(starting_text: &'a str, s: &'b str) -> &'b str {
     if s.starts_with(starting_text) {
         &s[starting_text.len()..]
-    } else { 
+    } else {
         panic!("expected {}, got {}", starting_text, s);
     }
 }
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn tag_word(){
+    fn tag_word() {
         assert_eq!(tag("foo", "foo a"), " a");
         assert_eq!(tag("let", "let a"), " a");
     }
-    
+
     #[test]
-    fn extract_ident_starts_with_num_error(){
+    fn extract_ident_starts_with_num_error() {
         assert_eq!(extract_ident("123"), ("123", ""));
     }
 
     #[test]
-    fn extract_alphabetic_ident(){
+    fn extract_alphabetic_ident() {
         assert_eq!(extract_ident("abcd stop"), (" stop", "abcd"));
     }
 
     #[test]
-    fn extract_alphabetic_func(){
+    fn extract_alphabetic_func() {
         assert_eq!(extract_ident("function01()"), ("()", "function01"));
     }
 
     #[test]
-    fn extract_space(){
+    fn extract_space() {
         assert_eq!(extract_whitespace("  1"), ("1", "  "));
     }
-    
+
     #[test]
     fn extract_one_digits_test() {
         assert_eq!(extract_digits("1+2"), ("+2", "1"));
     }
-    
+
     #[test]
     fn extract_multiple_digits_test() {
         assert_eq!(extract_digits("10-20"), ("-20", "10"));
@@ -119,5 +118,4 @@ mod tests {
     fn extract_slash() {
         assert_eq!(extract_op("/4"), ("4", "/"));
     }
-    
 }

@@ -1,3 +1,4 @@
+use crate::env::Env;
 use crate::expr::Expr;
 use crate::utils;
 
@@ -21,15 +22,23 @@ impl BindingDef {
 
         let (s, val) = Expr::new(s);
 
-        (s, Self { name: name.to_string(), val },)
-
+        (
+            s,
+            Self {
+                name: name.to_string(),
+                val,
+            },
+        )
+    }
+    pub(crate) fn eval(&self, env: &mut Env) {
+        env.store_binding(self.name.clone(), self.val.eval())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::expr::{Number, Op};
     use super::*;
+    use crate::expr::{Number, Op};
 
     #[test]
     fn parsing_binding_def() {
@@ -37,9 +46,9 @@ mod tests {
             BindingDef::new("let a = 10 / 2"),
             (
                 "",
-                BindingDef{
+                BindingDef {
                     name: "a".to_string(),
-                    val: Expr{
+                    val: Expr {
                         lhs: Number(10),
                         rhs: Number(2),
                         op: Op::Div,

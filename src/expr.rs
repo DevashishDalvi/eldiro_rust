@@ -1,4 +1,6 @@
+use crate::env::Env;
 use crate::utils;
+use crate::val::Val;
 
 #[derive(Debug, PartialEq)]
 pub struct Number(pub i32);
@@ -11,14 +13,14 @@ impl Number {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Op{
+pub enum Op {
     Add,
     Sub,
     Mul,
-    Div
+    Div,
 }
 
-impl Op{
+impl Op {
     pub fn new(s: &str) -> (&str, Self) {
         let (s, op) = utils::extract_op(s);
 
@@ -35,7 +37,7 @@ impl Op{
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Expr{
+pub struct Expr {
     pub lhs: Number,
     pub rhs: Number,
     pub op: Op,
@@ -50,16 +52,81 @@ impl Expr {
 
         (s, Self { lhs, rhs, op })
     }
-}
+    pub(crate) fn eval(&self) -> Val {
+        let Number(lhs) = self.lhs;
+        let Number(rhs) = self.rhs;
 
+        let result = match self.op {
+            Op::Add => lhs + rhs,
+            Op::Sub => lhs - rhs,
+            Op::Mul => lhs * rhs,
+            Op::Div => lhs / rhs,
+        };
+
+        Val::Number(result)
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use crate::expr::{Expr, Number, Op};
+    use crate::val::Val;
     // use super::*;
 
     #[test]
-    fn parse_one_plus_two(){
+    fn eval_add() {
+        assert_eq!(
+            Expr {
+                lhs: Number(10),
+                rhs: Number(10),
+                op: Op::Add,
+            }
+            .eval(),
+            Val::Number(20),
+        )
+    }
+
+    #[test]
+    fn eval_sub() {
+        assert_eq!(
+            Expr {
+                lhs: Number(10),
+                rhs: Number(10),
+                op: Op::Sub,
+            }
+            .eval(),
+            Val::Number(0),
+        )
+    }
+
+    #[test]
+    fn eval_mul() {
+        assert_eq!(
+            Expr {
+                lhs: Number(10),
+                rhs: Number(10),
+                op: Op::Mul,
+            }
+            .eval(),
+            Val::Number(100),
+        )
+    }
+
+    #[test]
+    fn eval_div() {
+        assert_eq!(
+            Expr {
+                lhs: Number(10),
+                rhs: Number(10),
+                op: Op::Div,
+            }
+            .eval(),
+            Val::Number(1),
+        )
+    }
+
+    #[test]
+    fn parse_one_plus_two() {
         assert_eq!(
             Expr::new("1    + 2"),
             (
@@ -99,4 +166,3 @@ mod tests {
         assert_eq!(Op::new("/"), ("", Op::Div));
     }
 }
-
